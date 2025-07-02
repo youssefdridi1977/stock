@@ -5,27 +5,6 @@ import { CommonModule } from '@angular/common';
   selector: 'app-supplier-list',
   standalone: true,
   imports: [CommonModule],
-  template: `
-    <div class="fade-in">
-      <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-          <h1 class="h2 text-gradient fw-bold">Fournisseurs</h1>
-          <p class="text-muted">Gérez vos fournisseurs</p>
-        </div>
-        <button class="btn btn-primary">
-          <i class="bi bi-plus-circle me-2"></i>
-          Nouveau fournisseur
-        </button>
-      </div>
-
-      <div class="card">
-        <div class="card-body text-center py-5">
-          <i class="bi bi-truck text-muted" style="font-size: 4rem;"></i>
-          <h5 class="text-muted mt-3">Module Fournisseurs</h5>
-          <p class="text-muted">Cette fonctionnalité sera implémentée prochainement.</p>
-        </div>
-      </div>
-    </div>
-  `
+  templateUrl: './supplier-list.component.html',
 })
 export class SupplierListComponent {}
