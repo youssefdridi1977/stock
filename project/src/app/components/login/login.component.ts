@@ -1,0 +1,128 @@
+import { Component, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
+import { LoginRequest } from '../../models/user.model';
+
+@Component({
+  selector: 'app-login',
+  standalone: true,
+  imports: [CommonModule, FormsModule],
+  template: `
+    <div class="login-container d-flex align-items-center justify-content-center">
+      <div class="container">
+        <div class="row justify-content-center">
+          <div class="col-md-6 col-lg-4">
+            <div class="login-card card p-4">
+              <div class="text-center mb-4">
+                <i class="bi bi-box-seam text-gradient" style="font-size: 3rem;"></i>
+                <h2 class="text-gradient fw-bold mt-2">StockManager</h2>
+                <p class="text-muted">Connectez-vous à votre compte</p>
+              </div>
+
+              <form (ngSubmit)="onSubmit()" #loginForm="ngForm">
+                <div class="mb-3">
+                  <label for="username" class="form-label">Nom d'utilisateur</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="username"
+                    name="username"
+                    [(ngModel)]="credentials.username"
+                    required
+                    placeholder="Entrez votre nom d'utilisateur"
+                    [disabled]="isLoading()"
+                  >
+                </div>
+
+                <div class="mb-3">
+                  <label for="password" class="form-label">Mot de passe</label>
+                  <input
+                    type="password"
+                    class="form-control"
+                    id="password"
+                    name="password"
+                    [(ngModel)]="credentials.password"
+                    required
+                    placeholder="Entrez votre mot de passe"
+                    [disabled]="isLoading()"
+                  >
+                </div>
+
+                @if (error()) {
+                  <div class="alert alert-danger" role="alert">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    {{ error() }}
+                  </div>
+                }
+
+                <button
+                  type="submit"
+                  class="btn btn-primary w-100 mb-3"
+                  [disabled]="!loginForm.valid || isLoading()"
+                >
+                  @if (isLoading()) {
+                    <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                    Connexion...
+                  } @else {
+                    <i class="bi bi-box-arrow-in-right me-2"></i>
+                    Se connecter
+                  }
+                </button>
+              </form>
+
+              <div class="mt-4 p-3 bg-light rounded">
+                <h6 class="fw-bold mb-3">Comptes de démonstration :</h6>
+                <div class="row g-2 text-sm">
+                  <div class="col-6"><strong>Admin :</strong></div>
+                  <div class="col-6"><code>admin</code></div>
+                  <div class="col-6"><strong>Manager :</strong></div>
+                  <div class="col-6"><code>manager</code></div>
+                  <div class="col-6"><strong>Employé :</strong></div>
+                  <div class="col-6"><code>employee</code></div>
+                  <div class="col-6"><strong>Mot de passe :</strong></div>
+                  <div class="col-6"><code>password</code></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `
+})
+export class LoginComponent {
+  credentials: LoginRequest = {
+    username: '',
+    password: ''
+  };
+
+  isLoading = signal(false);
+  error = signal<string | null>(null);
+
+  constructor(
+    private authService: AuthService,
+    private router: Router
+  ) {}
+
+  onSubmit(): void {
+    if (this.isLoading()) return;
+
+    this.isLoading.set(true);
+    this.error.set(null);
+
+    this.authService.login(this.credentials).subscribe({
+      next: () => {
+        this.router.navigate(['/dashboard']);
+      },
+      error: (error) => {
+        this.error.set(error.message || 'Erreur de connexion');
+        this.isLoading.set(false);
+      },
+      complete: () => {
+        this.isLoading.set(false);
+      }
+    });
+  }
+}
